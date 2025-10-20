@@ -14,8 +14,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxHeight // 保持引入
-import androidx.compose.foundation.layout.fillMaxWidth // 保持引入
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
@@ -77,19 +77,16 @@ fun Main(modifier: Modifier = Modifier) {
         mutableStateOf(textA)
     }
 
-    // MediaPlayer 狀態管理
     var mper: MediaPlayer? by remember { mutableStateOf(null) }
     DisposableEffect(Unit) {
         onDispose {
-            // 釋放 MediaPlayer 資源，避免記憶體洩漏
             mper?.release()
             mper = null
         }
     }
 
-    // 用於切換圖片的狀態變數
     var currentImageId by remember {
-        mutableStateOf(R.drawable.animal0) // 預設顯示 animal0
+        mutableStateOf(R.drawable.animal0)
     }
 
     val Animals = listOf(
@@ -177,10 +174,8 @@ fun Main(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.size(10.dp))
 
-        // 按鈕和切換文字的整體容器
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-            // **第一排：測試按鈕 (單獨一排)**
             Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.padding(bottom = 5.dp)) {
                 Button(onClick = {
                     currentToggleText = if (currentToggleText == textA) textB else textA
@@ -189,7 +184,6 @@ fun Main(modifier: Modifier = Modifier) {
                 }
             }
 
-            // **中間：顯示可切換的文字 (abc / edf)**
             Text(
                 text = currentToggleText,
                 fontSize = 24.sp,
@@ -198,9 +192,7 @@ fun Main(modifier: Modifier = Modifier) {
             )
 
 
-            // **第三排：歡迎修課、展翅飛翔、結束App (三個按鈕一排)**
             Row(horizontalArrangement = Arrangement.Center) {
-                // 歡迎修課按鈕 (播放 tcyang 音訊)
                 Button(
                     onClick = {
                         mper?.release()
@@ -209,8 +201,8 @@ fun Main(modifier: Modifier = Modifier) {
                         mper?.start()
                     },
                     modifier = Modifier
-                        .fillMaxWidth(0.33f) // **恢復 fillMaxWidth(0.33f)**
-                        .fillMaxHeight(0.8f), // **恢復 fillMaxHeight(0.8f)**
+                        .fillMaxWidth(0.33f)
+                        .fillMaxHeight(0.8f),
                     colors = buttonColors(Color.Green)
                 ) {
                     Text(text = "歡迎修課")
@@ -218,7 +210,6 @@ fun Main(modifier: Modifier = Modifier) {
 
                 Spacer(modifier = Modifier.size(10.dp))
 
-                // 展翅飛翔按鈕 (播放 fly 音訊並顯示 Toast)
                 Button(
                     onClick = {
                         mper?.release()
@@ -229,8 +220,8 @@ fun Main(modifier: Modifier = Modifier) {
                         Toast.makeText(context, "展翅飛翔，實現夢想！", Toast.LENGTH_LONG).show()
                     },
                     modifier = Modifier
-                        .fillMaxWidth(0.5f) // **恢復 fillMaxWidth(0.5f)**
-                        .fillMaxHeight(0.4f), // **恢復 fillMaxHeight(0.4f)**
+                        .fillMaxWidth(0.5f)
+                        .fillMaxHeight(0.4f),
                     colors = buttonColors(Color.Blue)
                 ) {
                     Text(text = "展翅飛翔")
@@ -238,7 +229,6 @@ fun Main(modifier: Modifier = Modifier) {
 
                 Spacer(modifier = Modifier.size(10.dp))
 
-                // 結束 App 按鈕
                 Button(
                     onClick = {
                         (context as? Activity)?.finish()
@@ -252,11 +242,8 @@ fun Main(modifier: Modifier = Modifier) {
                 }
             }
         }
-
-        Spacer(modifier = Modifier.size(20.dp)) // 在功能按鈕和圖片按鈕之間增加間隔
-
-        // **最底部：圖片切換按鈕**
-        Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+        Spacer(modifier = Modifier.size(20.dp))
+            Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
             Button(onClick = {
                 currentImageId = if (currentImageId == R.drawable.animal0) {
                     R.drawable.animal1
@@ -267,7 +254,7 @@ fun Main(modifier: Modifier = Modifier) {
                 Image(
                     painter = painterResource(id = currentImageId),
                     contentDescription = "切換動物圖片",
-                    modifier = Modifier.size(80.dp)
+                    modifier = Modifier.size(120.dp)
                 )
             }
         }
