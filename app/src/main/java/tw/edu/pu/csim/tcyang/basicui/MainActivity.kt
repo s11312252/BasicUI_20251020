@@ -2,6 +2,7 @@ package tw.edu.pu.csim.tcyang.basicui
 
 
 import android.app.Activity
+import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -37,10 +38,14 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import android.widget.Toast // 引入 Toast 類別
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonDefaults.buttonColors
+import androidx.compose.runtime.DisposableEffect
 
 import tw.edu.pu.csim.tcyang.basicui.ui.theme.BasicUITheme
 
@@ -62,19 +67,17 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Main(modifier: Modifier = Modifier) {
-    // 取得 Context 和 Activity
     val context = LocalContext.current
-    // 這裡我們不再在頂部宣告 activity 變數，而是直接在按鈕的 onClick 內部安全地轉換。
 
-    // 固定的作者文字
     val authorText = stringResource(R.string.app_author)
 
-    // 狀態變數：用於切換新文字 (abc / edf)
     val textA = "abc"
     val textB = "edf"
     var currentToggleText by remember {
         mutableStateOf(textA)
     }
+    var mper: MediaPlayer? by remember { mutableStateOf(null) }
+
 
 
     val Animals = listOf(
@@ -107,7 +110,6 @@ fun Main(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.size(10.dp))
 
-        // 顯示作者文字
         Text(
             text = authorText,
             fontSize = 20.sp,
@@ -115,7 +117,6 @@ fun Main(modifier: Modifier = Modifier) {
         )
         Spacer(modifier = Modifier.size(10.dp))
 
-        // 上方的三個圖示 (保持不變)
         Row {
             Image(
                 painter = painterResource(id = R.drawable.android),
@@ -142,7 +143,6 @@ fun Main(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.size(10.dp))
 
-        // LazyRow 滾動動物列表 (保持不變)
         LazyRow {
             items(51) { index ->
                 Row(
@@ -165,12 +165,9 @@ fun Main(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.size(10.dp))
 
-        // 按鈕和切換文字的整體容器
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-            // **第一排：測試按鈕 (單獨一排)**
             Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.padding(bottom = 5.dp)) {
-                // 1. 測試按鈕 (切換 abc/edf)
                 Button(onClick = {
                     currentToggleText = if (currentToggleText == textA) textB else textA
                 }) {
@@ -178,7 +175,6 @@ fun Main(modifier: Modifier = Modifier) {
                 }
             }
 
-            // **中間：顯示可切換的文字 (abc / edf)**
             Text(
                 text = currentToggleText,
                 fontSize = 24.sp,
@@ -187,39 +183,47 @@ fun Main(modifier: Modifier = Modifier) {
             )
 
 
-            // **第三排：歡迎修課、展翅飛翔、結束App (三個按鈕一排)**
+
             Row(horizontalArrangement = Arrangement.Center) {
-                // 2. 歡迎修課按鈕 (暫無作用)
-                Button(onClick =
-                    {
-                }) {
+                Button(
+                    onClick = {
+                        mper = MediaPlayer.create(context, R.raw.tcyang)
+                        mper?.start()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth(0.33f)
+                        .fillMaxHeight(0.8f),
+                    colors = buttonColors(Color.Green)
+
+                ) {
                     Text(text = "歡迎修課")
                 }
 
                 Spacer(modifier = Modifier.size(10.dp))
 
-                // 3. 展翅飛翔按鈕 (彈出 Toast)
                 Button(onClick = {
+
+                    mper = MediaPlayer.create(context, R.raw.fly)
+                    mper?.start()
+
                     Toast.makeText(context, "展翅飛翔，實現夢想！", Toast.LENGTH_LONG).show()
-                }) {
+                }   , modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .fillMaxHeight(0.4f),
+                    colors = buttonColors(Color.Blue)
+                )
+                {
                     Text(text = "展翅飛翔")
                 }
 
                 Spacer(modifier = Modifier.size(10.dp))
-
-                // 4. 結束 App 按鈕 (帶有自訂樣式)
                 Button(
                     onClick = {
-                        // 將 Context 安全地轉換(as?)為 Activity，並呼叫 finish()
                         (context as? Activity)?.finish()
                     },
-                    // 設定按鈕顏色為亮藍色
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00BFFF)),
-                    // 形狀：將元素的每個角落「切掉」一個直角
                     shape = CutCornerShape(10.dp),
-                    // 藍色框線
                     border = BorderStroke(1.dp, Color.Blue),
-                    // 陰影
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp)
                 ) {
                     Text(text = "結束App")
