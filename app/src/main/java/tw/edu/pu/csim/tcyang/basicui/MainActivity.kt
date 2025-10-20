@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight // 保持引入
+import androidx.compose.foundation.layout.fillMaxWidth // 保持引入
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
@@ -22,6 +24,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,12 +43,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonDefaults.buttonColors
-import androidx.compose.runtime.DisposableEffect
 
 import tw.edu.pu.csim.tcyang.basicui.ui.theme.BasicUITheme
 
@@ -76,13 +76,20 @@ fun Main(modifier: Modifier = Modifier) {
     var currentToggleText by remember {
         mutableStateOf(textA)
     }
+
+    // MediaPlayer 狀態管理
     var mper: MediaPlayer? by remember { mutableStateOf(null) }
-    DisposableEffect(Unit) { // Unit 作為 key 表示這個 effect 只會執行一次
+    DisposableEffect(Unit) {
         onDispose {
             // 釋放 MediaPlayer 資源，避免記憶體洩漏
             mper?.release()
             mper = null
         }
+    }
+
+    // 用於切換圖片的狀態變數
+    var currentImageId by remember {
+        mutableStateOf(R.drawable.animal0) // 預設顯示 animal0
     }
 
     val Animals = listOf(
@@ -170,8 +177,10 @@ fun Main(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.size(10.dp))
 
+        // 按鈕和切換文字的整體容器
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
+            // **第一排：測試按鈕 (單獨一排)**
             Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.padding(bottom = 5.dp)) {
                 Button(onClick = {
                     currentToggleText = if (currentToggleText == textA) textB else textA
@@ -180,6 +189,7 @@ fun Main(modifier: Modifier = Modifier) {
                 }
             }
 
+            // **中間：顯示可切換的文字 (abc / edf)**
             Text(
                 text = currentToggleText,
                 fontSize = 24.sp,
@@ -188,43 +198,47 @@ fun Main(modifier: Modifier = Modifier) {
             )
 
 
-
+            // **第三排：歡迎修課、展翅飛翔、結束App (三個按鈕一排)**
             Row(horizontalArrangement = Arrangement.Center) {
+                // 歡迎修課按鈕 (播放 tcyang 音訊)
                 Button(
                     onClick = {
-                        mper?.release()  //釋放資源
-                        mper = null // 清除舊引用
+                        mper?.release()
+                        mper = null
                         mper = MediaPlayer.create(context, R.raw.tcyang)
                         mper?.start()
                     },
                     modifier = Modifier
-                        .fillMaxWidth(0.33f)
-                        .fillMaxHeight(0.8f),
+                        .fillMaxWidth(0.33f) // **恢復 fillMaxWidth(0.33f)**
+                        .fillMaxHeight(0.8f), // **恢復 fillMaxHeight(0.8f)**
                     colors = buttonColors(Color.Green)
-
                 ) {
                     Text(text = "歡迎修課")
                 }
 
                 Spacer(modifier = Modifier.size(10.dp))
 
-                Button(onClick = {
-                    mper?.release()  //釋放資源
-                    mper = null // 清除舊引用
-                    mper = MediaPlayer.create(context, R.raw.fly)
-                    mper?.start()
+                // 展翅飛翔按鈕 (播放 fly 音訊並顯示 Toast)
+                Button(
+                    onClick = {
+                        mper?.release()
+                        mper = null
+                        mper = MediaPlayer.create(context, R.raw.fly)
+                        mper?.start()
 
-                    Toast.makeText(context, "展翅飛翔，實現夢想！", Toast.LENGTH_LONG).show()
-                }   , modifier = Modifier
-                    .fillMaxWidth(0.5f)
-                    .fillMaxHeight(0.4f),
+                        Toast.makeText(context, "展翅飛翔，實現夢想！", Toast.LENGTH_LONG).show()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth(0.5f) // **恢復 fillMaxWidth(0.5f)**
+                        .fillMaxHeight(0.4f), // **恢復 fillMaxHeight(0.4f)**
                     colors = buttonColors(Color.Blue)
-                )
-                {
+                ) {
                     Text(text = "展翅飛翔")
                 }
 
                 Spacer(modifier = Modifier.size(10.dp))
+
+                // 結束 App 按鈕
                 Button(
                     onClick = {
                         (context as? Activity)?.finish()
@@ -236,6 +250,25 @@ fun Main(modifier: Modifier = Modifier) {
                 ) {
                     Text(text = "結束App")
                 }
+            }
+        }
+
+        Spacer(modifier = Modifier.size(20.dp)) // 在功能按鈕和圖片按鈕之間增加間隔
+
+        // **最底部：圖片切換按鈕**
+        Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+            Button(onClick = {
+                currentImageId = if (currentImageId == R.drawable.animal0) {
+                    R.drawable.animal1
+                } else {
+                    R.drawable.animal0
+                }
+            }) {
+                Image(
+                    painter = painterResource(id = currentImageId),
+                    contentDescription = "切換動物圖片",
+                    modifier = Modifier.size(80.dp)
+                )
             }
         }
     }
