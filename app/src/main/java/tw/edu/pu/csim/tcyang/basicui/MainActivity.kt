@@ -82,7 +82,6 @@ fun Main(modifier: Modifier = Modifier) {
             fontSize = 20.sp,
             color = Color(0xFF654321)
         )
-
         Spacer(modifier = Modifier.size(10.dp))
 
         Row {
