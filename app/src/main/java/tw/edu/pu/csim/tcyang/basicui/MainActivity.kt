@@ -77,8 +77,13 @@ fun Main(modifier: Modifier = Modifier) {
         mutableStateOf(textA)
     }
     var mper: MediaPlayer? by remember { mutableStateOf(null) }
-
-
+    DisposableEffect(Unit) { // Unit 作為 key 表示這個 effect 只會執行一次
+        onDispose {
+            // 釋放 MediaPlayer 資源，避免記憶體洩漏
+            mper?.release()
+            mper = null
+        }
+    }
 
     val Animals = listOf(
         R.drawable.animal0, R.drawable.animal1,
@@ -187,6 +192,8 @@ fun Main(modifier: Modifier = Modifier) {
             Row(horizontalArrangement = Arrangement.Center) {
                 Button(
                     onClick = {
+                        mper?.release()  //釋放資源
+                        mper = null // 清除舊引用
                         mper = MediaPlayer.create(context, R.raw.tcyang)
                         mper?.start()
                     },
@@ -202,7 +209,8 @@ fun Main(modifier: Modifier = Modifier) {
                 Spacer(modifier = Modifier.size(10.dp))
 
                 Button(onClick = {
-
+                    mper?.release()  //釋放資源
+                    mper = null // 清除舊引用
                     mper = MediaPlayer.create(context, R.raw.fly)
                     mper?.start()
 
